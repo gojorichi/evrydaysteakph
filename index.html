@@ -104,6 +104,9 @@ nav{
 .nav-links a.active,
 .nav-links a:hover{color:var(--black)}
 .nav-links a.active::after{transform:scaleX(1)}
+.nav-actions{
+  display:flex;align-items:center;gap:10px;
+}
 .nav-order{
   background:var(--black);color:var(--white);
   padding:10px 22px;border-radius:2px;text-decoration:none;
@@ -123,7 +126,7 @@ nav{
 .ham.open span:nth-child(2){opacity:0}
 .ham.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
 @media(max-width:860px){
-  .nav-links,.nav-order{display:none}
+  .nav-links,.nav-actions{display:none}
   .ham{display:flex}
   nav{padding:0 20px}
 }
@@ -489,7 +492,7 @@ hr.rule{border:none;border-top:1px solid var(--border);margin:0}
 }
 .cart-overlay.open{opacity:1;pointer-events:auto}
 .cart-panel{
-  position:fixed;inset-y:0;right:0;z-index:calc(var(--z-cart) + 1);
+  position:fixed;top:0;bottom:0;right:0;z-index:calc(var(--z-cart) + 1);
   width:100%;max-width:420px;
   background:var(--white);
   border-left:1px solid var(--border);
@@ -709,15 +712,17 @@ footer{background:var(--black);padding:36px 52px}
     <li><a href="#menu">Menu</a></li>
     <li><a href="#cuts">Gallery</a></li>
     <li><a href="#reviews">Reviews</a></li>
-    <li><a href="#order">Order</a></li>
     <li><a href="#shop">Shop</a></li>
+    <li><a href="#order">Contact</a></li>
   </ul>
-  <button class="nav-cart-btn" id="cart-trigger-btn" aria-label="Shopping bag">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-    <span class="cart-badge" id="cart-counter">0</span>
-  </button>
-  <button class="nav-merchant-btn" id="view-toggle-btn">Merchant</button>
-  <a href="https://wa.me/639524594105" target="_blank" class="nav-order">Order Now</a>
+  <div class="nav-actions">
+    <button class="nav-merchant-btn" id="view-toggle-btn">Merchant</button>
+    <a href="https://wa.me/639524594105" target="_blank" class="nav-order">Contact Us</a>
+    <button class="nav-cart-btn" id="cart-trigger-btn" aria-label="Shopping bag">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span class="cart-badge" id="cart-counter">0</span>
+    </button>
+  </div>
   <button class="ham" id="ham-btn" aria-label="Toggle menu" aria-expanded="false">
     <span></span><span></span><span></span>
   </button>
@@ -752,11 +757,14 @@ footer{background:var(--black);padding:36px 52px}
       </span>
     </div>
     <div class="hero-btns">
-      <a href="https://wa.me/639524594105" target="_blank" class="btn btn-dark">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <a href="#shop" class="btn btn-dark">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         Order Now
       </a>
-      <a href="#menu" class="btn btn-ghost">View Menu</a>
+      <a href="#order" class="btn btn-ghost">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Contact Us
+      </a>
     </div>
   </div>
   <div class="hero-right">
@@ -875,13 +883,32 @@ footer{background:var(--black);padding:36px 52px}
 
 <hr class="rule">
 
-<!-- ORDER -->
+<!-- SHOP ONLINE -->
+<section id="shop" class="sec fade-in">
+  <div class="mw">
+    <div class="sec-head">
+      <span class="sec-lbl">Shop Online</span>
+      <h2 class="sec-title">Order &amp; Pay Now</h2>
+      <p class="sec-sub">Browse our catalog, add to bag, and pay securely via GCash, card, or Maya &mdash; all without leaving this page.</p>
+    </div>
+    <div class="shop-grid" id="product-grid">
+      <!-- skeleton placeholders while loading -->
+      <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div><div class="skeleton-line price"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div><div class="skeleton-line price"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div><div class="skeleton-line price"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- CONTACT -->
 <section id="order" class="sec fade-in">
   <div class="mw">
     <div class="sec-head">
-      <span class="sec-lbl">Place an Order</span>
-      <h2 class="sec-title">Order Now</h2>
-      <p class="sec-sub">WhatsApp is the fastest way to reach us. All links also available via our Linktree.</p>
+      <span class="sec-lbl">Contact Us</span>
+      <h2 class="sec-title">Got a Question?</h2>
+      <p class="sec-sub">Have a special request, a concern, or need help choosing a cut? Reach out through any of these channels and we'll get back to you as soon as possible.</p>
     </div>
     <div class="order-grid">
       <div>
@@ -907,7 +934,7 @@ footer{background:var(--black);padding:36px 52px}
         </div>
         <div class="info-card">
           <h4>Delivery &amp; Packaging</h4>
-          <p>All orders are vacuum-sealed for freshness and include a <strong>complimentary insulated bag</strong>. Message us on WhatsApp for the fastest order processing.</p>
+          <p>All orders are vacuum-sealed for freshness and include a <strong>complimentary insulated bag</strong>. For special cuts or bulk requests, send us a message on WhatsApp.</p>
         </div>
       </div>
       <div>
@@ -924,28 +951,11 @@ footer{background:var(--black);padding:36px 52px}
             <input type="tel" name="phone" placeholder="Phone / WhatsApp" autocomplete="tel">
           </div>
           <input type="email" name="email" placeholder="Email Address" required autocomplete="email">
-          <input type="text" name="subject" placeholder="What are you ordering?">
-          <textarea name="message" placeholder="Special requests or questions..." required></textarea>
+          <input type="text" name="subject" placeholder="Subject (e.g. bulk order, custom cut)">
+          <textarea name="message" placeholder="Tell us about your concern or special request..." required></textarea>
           <button type="submit">Send Message</button>
         </form>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- SHOP ONLINE -->
-<section id="shop" class="sec fade-in">
-  <div class="mw">
-    <div class="sec-head">
-      <span class="sec-lbl">Shop Online</span>
-      <h2 class="sec-title">Order &amp; Pay Now</h2>
-      <p class="sec-sub">Browse our catalog, add to bag, and pay securely via GCash, card, or Maya &mdash; all without leaving this page.</p>
-    </div>
-    <div class="shop-grid" id="product-grid">
-      <!-- skeleton placeholders while loading -->
-      <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div><div class="skeleton-line price"></div></div></div>
-      <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div><div class="skeleton-line price"></div></div></div>
-      <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div><div class="skeleton-line price"></div></div></div>
     </div>
   </div>
 </section>
