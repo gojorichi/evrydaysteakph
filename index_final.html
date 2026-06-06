@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>evryday steak. — Premium Retail & POS</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#FDF2F2',
+                            100: '#FDE8E8',
+                            600: '#C41E1E', 
+                            700: '#A81818',
+                            900: '#7A1010',
+                            gold: '#D4AF37', 
+                        },
+                        neutral: {
+                            50: '#F9F8F5',  
+                            100: '#F2F0EB', 
+                            200: '#E4E2DC', 
+                            300: '#C8C6C0', 
+                            400: '#909088', 
+                            800: '#2A2A28', 
+                            900: '#1C1C1C', 
+                            950: '#0A0A0A', 
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Chromatane', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons — pinned stable version from cdnjs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+    <style>
+        @import url('https://fonts.cdnfonts.com/css/chromatane');
+        body { font-family: 'Chromatane', sans-serif; token-behavior: smooth; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="h-full bg-neutral-50 text-neutral-900 selection:bg-brand-600 selection:text-white flex flex-col antialiased">
+
+    <!-- CONFIGURATION NOTIFICATION BANNER -->
+    <div id="setup-banner" class="bg-amber-600 text-white text-xs px-4 py-2 text-center font-mono tracking-widest uppercase z-50">
+        ⚠️ API Endpoint Unconfigured. Update API_ENDPOINT in the code script to synchronize with Google Sheets.
+    </div>
+
+    <!-- MAIN APP STRUCTURE -->
+    <header class="sticky top-0 z-40 bg-neutral-50/80 backdrop-blur-md border-b border-neutral-200 px-4 lg:px-12 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <span class="text-xl font-black tracking-tighter uppercase text-brand-600">evryday steak<span class="text-neutral-900">.</span></span>
+            <span class="text-[9px] uppercase tracking-widest bg-neutral-900 text-neutral-50 px-2 py-0.5 font-mono">BETA v2.0-PHP</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button id="view-toggle-btn" class="text-xs uppercase tracking-widest border border-neutral-900 px-4 py-2 font-medium hover:bg-neutral-900 hover:text-neutral-50 transition-all duration-300 flex items-center gap-2">
+                <i data-lucide="shield-alert" class="w-4 h-4"></i> Merchant Suite
+            </button>
+            <button id="cart-trigger-btn" class="relative p-2 hover:text-brand-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                <span id="cart-counter" class="absolute -top-1 -right-1 bg-brand-600 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full scale-0 transition-transform duration-300">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- CONTENT ROOT -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-12 py-8 relative">
+        
+        <!-- STOREFRONT COMPONENT -->
+        <section id="storefront-section" class="space-y-8">
+            <div class="border-l-4 border-brand-600 pl-4 py-1">
+                <h1 class="text-2xl font-extrabold tracking-tight uppercase text-neutral-900">Retail Inventory</h1>
+                <p class="text-xs text-neutral-400 tracking-wide mt-1">Premium USDA Cuts & Gourmet Selections</p>
+            </div>
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Dynamic grid elements render here -->
+            </div>
+        </section>
+
+        <!-- MERCHANT SUITE COMPONENT -->
+        <section id="admin-section" class="hidden space-y-8 animate-fadeIn">
+            <div class="border-l-4 border-neutral-900 pl-4 py-1 flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-extrabold tracking-tight uppercase text-neutral-900">System Dashboard</h1>
+                    <p class="text-xs text-neutral-400 tracking-wide mt-1">Synchronized with Google Sheets Realtime Engine</p>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto border border-neutral-200 bg-white">
+                <table class="w-full text-left border-collapse font-mono text-xs">
+                    <thead>
+                        <tr class="bg-neutral-100 border-b border-neutral-200 uppercase tracking-wider text-neutral-400 font-bold">
+                            <th class="p-4">SKU ID</th>
+                            <th class="p-4">Item Identity</th>
+                            <th class="p-4">Price (PHP)</th>
+                            <th class="p-4">PayMongo Pipeline</th>
+                            <th class="p-4 text-center">Commit</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body">
+                        <!-- Admin control objects dynamically loaded -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- RAW PAYLOAD INSPECTOR — helps diagnose Sheety key mapping issues -->
+            <div class="border border-dashed border-neutral-300 bg-neutral-100 p-4 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-mono uppercase tracking-widest text-neutral-400">⚙ Raw Sheety Payload Inspector</span>
+                    <button onclick="document.getElementById('raw-payload-box').classList.toggle('hidden')" class="text-[10px] font-mono uppercase tracking-widest text-neutral-400 hover:text-neutral-900 border border-neutral-300 px-2 py-0.5">Toggle</button>
+                </div>
+                <pre id="raw-payload-box" class="hidden text-[10px] font-mono text-neutral-600 bg-white border border-neutral-200 p-4 overflow-x-auto whitespace-pre-wrap max-h-64 overflow-y-auto">Fetch data to inspect payload...</pre>
+            </div>
+        </section>
+    </main>
+
+    <!-- SLIDE DRAWERS & CART MODALS -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 pointer-events-none overflow-hidden">
+        <div id="cart-overlay" class="absolute inset-0 bg-neutral-950/40 backdrop-blur-sm opacity-0 transition-opacity duration-500 pointer-events-auto hidden"></div>
+        <div id="cart-panel" class="absolute inset-y-0 right-0 max-w-md w-full bg-neutral-50 shadow-2xl border-l border-neutral-200 pointer-events-auto transform translate-x-full transition-transform duration-500 ease-out flex flex-col">
+
+            <!-- ── VIEW A: CART ── -->
+            <div id="cart-view" class="flex flex-col flex-1 min-h-0">
+                <div class="p-6 border-b border-neutral-200 flex items-center justify-between shrink-0">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="shopping-bag" class="text-brand-600"></i>
+                        <h2 class="text-lg font-black tracking-tight uppercase">Current Order</h2>
+                    </div>
+                    <button id="cart-close-btn" class="p-2 hover:text-brand-600 transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
+                </div>
+                <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar">
+                    <!-- Dynamically assigned item lines -->
+                </div>
+                <div class="p-6 border-t border-neutral-200 bg-neutral-100 space-y-4 shrink-0">
+                    <div class="flex justify-between font-bold text-lg">
+                        <span class="uppercase tracking-tight">Estimated Total:</span>
+                        <span id="cart-total-value" class="text-brand-600 font-mono">₱0.00</span>
+                    </div>
+                    <button id="checkout-action-btn" class="w-full bg-brand-600 text-white font-bold py-4 uppercase tracking-widest hover:bg-brand-700 active:scale-[0.99] transition-all duration-300 flex items-center justify-center gap-3">
+                        <i data-lucide="credit-card" class="w-5 h-5"></i> Process Secure Payment
+                    </button>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- NOTIFICATION PIPELINES -->
+    <div id="toast-notification" class="fixed bottom-6 right-6 z-50 bg-neutral-900 text-neutral-50 px-6 py-4 flex items-center gap-4 shadow-2xl border border-neutral-800 transform translate-x-[150%] transition-transform duration-500 font-mono text-xs tracking-wider uppercase">
+        <i id="toast-icon" data-lucide="check-circle" class="text-brand-600 w-5 h-5"></i>
+        <span id="toast-message">Operation Completed</span>
+    </div>
+
+    <!-- CODE SCRIPT EXECUTIONS -->
+    <script>
+        // =========================================================
+        // DB ARCHITECTURE CONFIGURATION
+        // =========================================================
+        const API_ENDPOINT = "https://api.sheety.co/ff0a54b0bc6d9c2aec3409ff1a0ff804/evrydaySteakDatabase/sheet1";
+
+        // PASTE YOUR PAYMONGO PUBLIC KEY HERE (pk_live_... or pk_test_...):
+        const PAYMONGO_PUBLIC_KEY = "pk_test_nLeVWgH2FbbPBX6brh7kfACs";
+
+        // Success/cancel redirect URLs after PayMongo checkout
+        const PAYMONGO_SUCCESS_URL = window.location.href;
+        const PAYMONGO_CANCEL_URL  = window.location.href;
+        let products = [];
+        let cart = [];
+        let currentView = 'storefront';
+
+        const pesoFormatter = new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP',
+            minimumFractionDigits: 2
+        });
+
+        // Safe wrapper — guards every lucide.createIcons() call app-wide
+        function safeCreateIcons() {
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        }
+
+        // Wait for both DOM and all external scripts (lucide) to be fully loaded
+        window.addEventListener("load", () => {
+            safeCreateIcons();
+            initializeApplicationLifecycle();
+            setupInteractivityListeners();
+        });
+
+        async function initializeApplicationLifecycle() {
+            const PLACEHOLDER = "UPDATE_YOUR_SHEETY_URL_HERE";
+            if (!API_ENDPOINT || API_ENDPOINT.trim() === "" || API_ENDPOINT.includes(PLACEHOLDER)) {
+                console.warn("API Engine offline: Using local fallback data variables.");
+                loadFallbackMockData();
+                document.getElementById('setup-banner').classList.remove('hidden');
+                return;
+            }
+            
+            document.getElementById('setup-banner').classList.add('hidden');
+            try {
+                const response = await fetch(API_ENDPOINT);
+                if (!response.ok) throw new Error("Target sheet endpoint returned initialization fault code");
+                
+                const rawPayload = await response.json();
+
+                // ── DEBUG: log exact raw payload so we can see Sheety's key names ──
+                console.log("[evryday steak] RAW SHEETY PAYLOAD:", JSON.stringify(rawPayload, null, 2));
+
+                // Sheety always nests rows under the tab name key (e.g. "sheet1")
+                const rootKey = Object.keys(rawPayload)[0];
+                const rawRows = rawPayload[rootKey] || [];
+                console.log(`[evryday steak] Root key: "${rootKey}" | Row count: ${rawRows.length}`);
+                products = deduplicateById(rawRows.map(normalizeSpreadsheetFields).filter(isCompleteProduct));
+                console.log(`[evryday steak] Normalized products:`, products);
+
+                // Populate the merchant inspector panel with raw + normalized comparison
+                const inspectorBox = document.getElementById('raw-payload-box');
+                if (inspectorBox) {
+                    const rootKey = Object.keys(rawPayload)[0];
+                    const rawRows = rawPayload[rootKey] || rawPayload;
+                    const firstRaw = Array.isArray(rawRows) ? rawRows[0] : rawRows;
+                    inspectorBox.textContent =
+                        "── SHEETY RAW KEYS (first row) ──\n" +
+                        JSON.stringify(firstRaw, null, 2) +
+                        "\n\n── NORMALIZED OUTPUT (first product) ──\n" +
+                        JSON.stringify(products[0] || {}, null, 2);
+                }
+
+                if (products.length === 0) {
+                    console.warn("[evryday steak] Sheety returned rows but none normalized correctly. Check column header names in your Google Sheet.");
+                    showToast("0 PRODUCTS LOADED — CHECK SHEET HEADERS", "alert-triangle");
+                } else {
+                    showToast(`${products.length} PRODUCTS LOADED FROM SHEET`, "check-circle");
+                }
+
+                updateStorefrontUI();
+                updateAdminTableUI();
+            } catch (err) {
+                console.error("Critical System Interruption:", err);
+                showToast("DB CONNECTION FAULT DETECTED", "alert-circle");
+                loadFallbackMockData();
+            }
+        }
+
+        function normalizeSpreadsheetFields(item, index) {
+            // Headers are clean lowercase: id | name | price | imageurl | description | paymentlink
+            // Sheety delivers them exactly as-is. Simple direct key lookup.
+            if (index === 0) console.log("[evryday steak] First row from Sheety:", item);
+
+            const name        = item.name        || "";
+            const price       = parseFloat(item.price || 0);
+            const description = item.description || "";
+            const imageUrl    = item.imageurl    || "https://images.unsplash.com/photo-1544025162-d76694265947";
+            const paymentLink = item.paymentlink || "#";
+            // item.id = Sheety's numeric row id (needed for PUT calls)
+            const id          = String(item.id || ('row_' + index)).trim();
+
+            return { id, name, price, imageUrl, description, paymentLink,
+                     _incomplete: !name || !price };
+        }
+
+        function isCompleteProduct(p) {
+            if (p._incomplete) {
+                console.warn("[evryday steak] Skipping incomplete row:", p.id, p.name);
+                return false;
+            }
+            return true;
+        }
+
+        function deduplicateById(arr) {
+            // Guard against Sheety cache returning duplicate rows on slow syncs
+            const seen = new Set();
+            return arr.filter(p => {
+                if (seen.has(p.id)) return false;
+                seen.add(p.id);
+                return true;
+            });
+        }
+
+        function loadFallbackMockData() {
+            // No hardcoded products — the sheet is the single source of truth.
+            // Show a clear error state so the merchant knows the connection failed.
+            products = [];
+            updateStorefrontUI();
+            updateAdminTableUI();
+
+            const grid = document.getElementById("product-grid");
+            grid.innerHTML = `
+                <div class="col-span-full py-16 flex flex-col items-center justify-center text-center space-y-3 border border-dashed border-neutral-300 bg-white">
+                    <i data-lucide="wifi-off" class="w-8 h-8 text-neutral-300"></i>
+                    <p class="text-xs font-mono uppercase tracking-widest text-neutral-500 font-bold">Sheety Connection Failed</p>
+                    <p class="text-xs text-neutral-400 max-w-xs">Could not reach the Google Sheet database. Check your Sheety API endpoint, ensure GET is enabled, and verify the sheet is published.</p>
+                    <button onclick="initializeApplicationLifecycle()" class="mt-2 text-[10px] font-mono uppercase tracking-widest border border-neutral-300 px-4 py-2 hover:bg-neutral-900 hover:text-white hover:border-neutral-900 transition-all">
+                        ↻ Retry Connection
+                    </button>
+                </div>
+            `;
+            safeCreateIcons();
+        }
+
+        // =========================================================
+        // USER INTERFACE RENDERING ENGINE
+        // =========================================================
+        function updateStorefrontUI() {
+            const grid = document.getElementById("product-grid");
+            grid.innerHTML = "";
+
+            if (products.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-neutral-400 font-mono text-xs uppercase">No products active in your catalog database.</div>`;
+                return;
+            }
+
+            products.forEach(product => {
+                const card = document.createElement("div");
+                card.className = "bg-white border border-neutral-200 overflow-hidden shadow-sm hover:shadow-xl hover:border-brand-600/30 transition-all duration-500 flex flex-col group";
+                card.innerHTML = `
+                    <div class="h-64 bg-neutral-100 overflow-hidden relative">
+                        <img src="${product.imageUrl}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" onerror="this.src='https://images.unsplash.com/photo-1544025162-d76694265947'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-neutral-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+                        <div class="space-y-2">
+                            <h3 class="font-extrabold uppercase tracking-tight text-lg leading-tight text-neutral-900">${product.name}</h3>
+                            <p class="text-xs text-neutral-400 line-clamp-3">${product.description}</p>
+                        </div>
+                        <div class="pt-2 flex items-center justify-between">
+                            <span class="font-mono font-bold text-brand-600 text-lg">${pesoFormatter.format(product.price)}</span>
+                            <button onclick="appendItemToCart('${product.id}')" class="bg-neutral-900 text-white hover:bg-brand-600 px-4 py-2 text-xs font-mono uppercase tracking-widest transition-all duration-300 flex items-center gap-2">
+                                <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i> Add to Bag
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            safeCreateIcons();
+        }
+
+        function updateAdminTableUI() {
+            const tbody = document.getElementById("admin-table-body");
+            tbody.innerHTML = "";
+
+            products.forEach(product => {
+                const tr = document.createElement("tr");
+                tr.className = "border-b border-neutral-200 hover:bg-neutral-50/80 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4 font-bold text-neutral-400">${product.id}</td>
+                    <td class="p-4 uppercase font-bold text-neutral-800">${product.name}</td>
+                    <td class="p-4">
+                        <input type="number" id="inline-price-${product.id}" value="${product.price}" class="w-24 border border-neutral-200 px-2 py-1 focus:border-brand-600 focus:outline-none bg-transparent">
+                    </td>
+                    <td class="p-4">
+                        <input type="text" id="inline-link-${product.id}" value="${product.paymentLink}" class="w-full max-w-xs border border-neutral-200 px-2 py-1 focus:border-brand-600 focus:outline-none text-[10px] text-neutral-400 font-sans">
+                    </td>
+                    <td class="p-4 text-center">
+                        <button onclick="commitMerchantChanges('${product.id}')" class="text-[10px] tracking-widest bg-neutral-900 text-white px-3 py-1.5 uppercase hover:bg-brand-600 transition-colors">
+                            Push Updates
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // =========================================================
+        // SHOPPING BAG CORE CONTROLLERS & CHECKOUT REDIRECT
+        // =========================================================
+        window.appendItemToCart = function(productId) {
+            // Find in current data model stringently
+            const product = products.find(p => String(p.id) === String(productId));
+            if (!product) return;
+
+            const existingCartLine = cart.find(line => String(line.id) === String(productId));
+            if (existingCartLine) {
+                existingCartLine.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            synchronizeCartState();
+            showToast("ITEM ADDED TO ORDER BUCKET", "shopping-bag");
+        };
+
+        function modifyLineQuantity(productId, delta) {
+            const line = cart.find(item => String(item.id) === String(productId));
+            if (!line) return;
+
+            line.quantity += delta;
+            if (line.quantity <= 0) {
+                cart = cart.filter(item => String(item.id) !== String(productId));
+            }
+            synchronizeCartState();
+        }
+
+        function synchronizeCartState() {
+            const count = cart.reduce((acc, current) => acc + current.quantity, 0);
+            const total = cart.reduce((acc, current) => acc + (current.price * current.quantity), 0);
+            
+            const counterEl = document.getElementById("cart-counter");
+            if (count > 0) {
+                counterEl.innerText = count;
+                counterEl.classList.remove("scale-0");
+                counterEl.classList.add("scale-100");
+            } else {
+                counterEl.classList.remove("scale-100");
+                counterEl.classList.add("scale-0");
+            }
+
+            document.getElementById("cart-total-value").innerText = pesoFormatter.format(total);
+
+            const container = document.getElementById("cart-items-container");
+            container.innerHTML = "";
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="h-48 flex flex-col items-center justify-center text-center space-y-2 text-neutral-400">
+                        <i data-lucide="frown" class="w-8 h-8 stroke-[1.5]"></i>
+                        <p class="text-xs font-mono uppercase tracking-wider">No items added yet</p>
+                    </div>
+                `;
+                safeCreateIcons();
+                return;
+            }
+
+            cart.forEach(item => {
+                const itemRow = document.createElement("div");
+                itemRow.className = "flex items-center gap-4 bg-white border border-neutral-200 p-3 shadow-sm";
+                itemRow.innerHTML = `
+                    <img src="${item.imageUrl}" class="w-16 h-16 object-cover border border-neutral-100" onerror="this.src='https://images.unsplash.com/photo-1544025162-d76694265947'">
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-xs font-extrabold uppercase tracking-tight truncate text-neutral-900">${item.name}</h4>
+                        <p class="text-xs text-brand-600 font-mono font-bold mt-0.5">${pesoFormatter.format(item.price)}</p>
+                        <div class="flex items-center gap-2 mt-2">
+                            <button onclick="modifyLineQuantity('${item.id}', -1)" class="w-5 h-5 bg-neutral-100 rounded flex items-center justify-center text-xs font-bold hover:bg-neutral-200">-</button>
+                            <span class="font-mono text-xs w-4 text-center font-bold">${item.quantity}</span>
+                            <button onclick="modifyLineQuantity('${item.id}', 1)" class="w-5 h-5 bg-neutral-100 rounded flex items-center justify-center text-xs font-bold hover:bg-neutral-200">+</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(itemRow);
+            });
+            safeCreateIcons();
+        }
+
+        // =========================================================
+        // PAYMONGO DYNAMIC CHECKOUT SESSION
+        // =========================================================
+        async function executeSecureCheckoutPipeline() {
+            if (cart.length === 0) {
+                showToast("YOUR SHOPPING BAG IS EMPTY", "alert-circle");
+                return;
+            }
+
+            // Key is now stored securely in Netlify environment variables
+
+            // Lock the button and show loading state
+            const btn = document.getElementById("checkout-action-btn");
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Creating Checkout...`;
+            safeCreateIcons();
+            showToast("CREATING PAYMONGO SESSION...", "loader");
+
+            try {
+                // Build line_items array — PayMongo expects amounts in centavos
+                const lineItems = cart.map(item => ({
+                    currency: "PHP",
+                    amount: Math.round(item.price * 100),   // pesos → centavos
+                    name: item.name,
+                    quantity: item.quantity,
+                    description: item.description || item.name
+                }));
+
+                const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const orderDescription = cart.map(i => `${i.quantity}x ${i.name}`).join(", ");
+
+                const payload = {
+                    data: {
+                        attributes: {
+                            billing: { name: "evryday steak. Customer" },
+                            line_items: lineItems,
+                            payment_method_types: ["card", "gcash", "paymaya", "billease", "brankas_bdo", "brankas_landbank"],
+                            success_url: PAYMONGO_SUCCESS_URL,
+                            cancel_url: PAYMONGO_CANCEL_URL,
+                            description: `evryday steak. Order — ${orderDescription}`,
+                            statement_descriptor: "EVRYDAY STEAK",
+                            metadata: {
+                                order_items: orderDescription,
+                                order_total_php: cartTotal.toString()
+                            }
+                        }
+                    }
+                };
+
+                const response = await fetch("https://everydaysteakph.netlify.app/.netlify/functions/create-checkout", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    const errDetail = data?.errors?.[0]?.detail || data?.errors?.[0]?.code || "Unknown PayMongo error";
+                    throw new Error(errDetail);
+                }
+
+                const checkoutUrl = data?.data?.attributes?.checkout_url;
+                if (!checkoutUrl) throw new Error("No checkout_url returned from PayMongo. Check your public key.");
+
+                showToast("REDIRECTING TO SECURE CHECKOUT...", "credit-card");
+                setTimeout(() => { window.location.href = checkoutUrl; }, 800);
+
+            } catch (err) {
+                console.error("[evryday steak] PayMongo checkout error:", err);
+                showToast(`CHECKOUT FAILED: ${err.message.toUpperCase().slice(0, 40)}`, "alert-circle");
+                // Restore button
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="credit-card" class="w-5 h-5"></i> Process Secure Payment`;
+                safeCreateIcons();
+            }
+        }
+
+        // =========================================================
+        // MERCHANT API WRITEBACK ENGINE (PUT METHOD)
+        // =========================================================
+        async function commitMerchantChanges(productId) {
+            const newPrice = parseFloat(document.getElementById(`inline-price-${productId}`).value);
+            const newLink = document.getElementById(`inline-link-${productId}`).value;
+
+            if (isNaN(newPrice) || !newLink) {
+                showToast("DATA FORMAT CHECK FAILED", "alert-circle");
+                return;
+            }
+
+            const internalItem = products.find(p => String(p.id) === String(productId));
+            if (internalItem) {
+                internalItem.price = newPrice;
+                internalItem.paymentLink = newLink;
+            }
+
+            updateStorefrontUI();
+            showToast("SYNCHRONIZING WITH CLOUD SPREADSHEET...", "refresh-cw");
+
+            const PLACEHOLDER = "UPDATE_YOUR_SHEETY_URL_HERE";
+            if (!API_ENDPOINT || API_ENDPOINT.trim() === "" || API_ENDPOINT.includes(PLACEHOLDER)) {
+                setTimeout(() => { showToast("LOCAL CACHE UPDATE SUCCEEDED", "check-circle"); }, 1000);
+                return;
+            }
+
+            try {
+                // Sheety PUT: append the row's numeric id to the endpoint URL
+                // Body must be keyed by the sheet tab name ("sheet1")
+                const writeTargetUrl = `${API_ENDPOINT}/${productId}`;
+                const requestOptions = {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sheet1: { price: newPrice, paymentlink: newLink }
+                    })
+                };
+
+                const response = await fetch(writeTargetUrl, requestOptions);
+                if (!response.ok) throw new Error("API infrastructure write failure");
+
+                showToast("CLOUD DATABASE COMMITTED", "cloud-lightning");
+            } catch (err) {
+                console.error("Write operation interrupted:", err);
+                showToast("WRITE ERROR: ASSURE PUT METHOD IS TOGGLED ON SHEETY", "alert-triangle");
+            }
+        }
+
+        // =========================================================
+        // SIDE PANEL & COMPONENT CONTROLLER OVERLAYS
+        // =========================================================
+        function setupInteractivityListeners() {
+            const cartPanel = document.getElementById("cart-panel");
+            const cartOverlay = document.getElementById("cart-overlay");
+
+            function toggleCartDrawer(open) {
+                if (open) {
+                    cartOverlay.classList.remove("hidden");
+                    setTimeout(() => {
+                        cartOverlay.classList.add("opacity-100");
+                        cartPanel.classList.remove("translate-x-full");
+                    }, 50);
+                } else {
+                    cartPanel.classList.add("translate-x-full");
+                    cartOverlay.classList.remove("opacity-100");
+                    setTimeout(() => {
+                        cartOverlay.classList.add("hidden");
+                    }, 500);
+                }
+            }
+
+            document.getElementById("cart-trigger-btn").addEventListener("click", () => toggleCartDrawer(true));
+            document.getElementById("cart-close-btn").addEventListener("click", () => toggleCartDrawer(false));
+            cartOverlay.addEventListener("click", () => toggleCartDrawer(false));
+            document.getElementById("checkout-action-btn").addEventListener("click", executeSecureCheckoutPipeline);
+
+
+            document.getElementById("view-toggle-btn").addEventListener("click", (e) => {
+                const sf = document.getElementById("storefront-section");
+                const admin = document.getElementById("admin-section");
+                
+                if (currentView === 'storefront') {
+                    sf.classList.add("hidden");
+                    admin.classList.remove("hidden");
+                    e.currentTarget.innerHTML = `<i data-lucide="shopping-bag" class="w-4 h-4"></i> Consumer View`;
+                    currentView = 'admin';
+                } else {
+                    admin.classList.add("hidden");
+                    sf.classList.remove("hidden");
+                    e.currentTarget.innerHTML = `<i data-lucide="shield-alert" class="w-4 h-4"></i> Merchant Suite`;
+                    currentView = 'storefront';
+                }
+                safeCreateIcons();
+            });
+        }
+
+        function showToast(message, iconName = "check-circle") {
+            const toast = document.getElementById("toast-notification");
+            document.getElementById("toast-message").innerText = message;
+            document.getElementById("toast-icon").setAttribute("data-lucide", iconName);
+            safeCreateIcons();
+
+            toast.classList.remove('translate-x-[150%]');
+            setTimeout(() => {
+                toast.classList.add('translate-x-[150%]');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
